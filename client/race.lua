@@ -100,7 +100,8 @@ local function RaceUI()
                         Type = CurrentRaceData.RaceType,
                     },
                     active = true,
-                })                
+                })
+                Wait(200)
             else
                 SendNUIMessage({
                     action = "Update",
@@ -108,8 +109,8 @@ local function RaceUI()
                     data = {},
                     active = false,
                 })
+                break
             end
-            Wait(200)
         end
     end)
 end
@@ -320,7 +321,6 @@ RegisterNetEvent('qb-races:client:CountdownRace', function(id, drivers, best)
     else
         SetNewWaypoint(Races[id].RaceFinish.x, Races[id].RaceFinish.y)
     end
-    RaceUI()
     CurrentRaceData.RaceIndex = id
     CurrentRaceData.RaceType = Races[id].RaceType
     CurrentRaceData.RaceLaps = Races[id].RaceLaps
@@ -350,6 +350,7 @@ RegisterNetEvent('qb-races:client:CountdownRace', function(id, drivers, best)
     end
 
     CurrentRaceData.RaceStarted = true
+    RaceUI()
     Joined = false
     FreezeEntityPosition(GetVehiclePedIsIn(PlayerPedId(), true), false)
     QBCore.Functions.Notify(Lang:t("message_go"), 'success')

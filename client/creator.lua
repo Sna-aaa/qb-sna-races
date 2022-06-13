@@ -239,7 +239,7 @@ local function CreatorLoop()
                     CreatorData.ConfirmDelete = false
                 end
             end
-            Wait(3)
+            Wait(0)
         end
     end)
 end
@@ -284,6 +284,7 @@ local function CreatorUI()
                     data = CreatorData,
                     active = true,
                 })
+                Wait(200)
             else
                 SendNUIMessage({
                     action = "Update",
@@ -293,7 +294,6 @@ local function CreatorUI()
                 })
                 break
             end
-            Wait(200)
         end
     end)
 end

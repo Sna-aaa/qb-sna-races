@@ -243,29 +243,33 @@ end)
 local function StartRace(src)
 	local Player = QBCore.Functions.GetPlayer(src)
     TriggerClientEvent('qb-races:client:RemoveRace', -1, Player.PlayerData.citizenid)
-    if Races[Player.PlayerData.citizenid].RaceTrack ~= "no" then
-        Config.Tracks[Races[Player.PlayerData.citizenid].RaceTrack].occupied = true
-    end
-    local type 
-    if Races[Player.PlayerData.citizenid].RaceType == "train" then
-        type = "race"
-    else
-        type = Races[Player.PlayerData.citizenid].RaceType
-    end
-
-    for k, v in pairs(Races[Player.PlayerData.citizenid].RaceDrivers) do
-        local result = MySQL.Sync.fetchAll('SELECT * FROM races WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {Races[Player.PlayerData.citizenid].RaceTrack, k, type, v.car})
-        if result[1] then
-            v.best = result[1].best
-        else
-            v.best = 0
+    if Races[Player.PlayerData.citizenid] then
+        if Races[Player.PlayerData.citizenid].RaceTrack ~= "no" then
+            Config.Tracks[Races[Player.PlayerData.citizenid].RaceTrack].occupied = true
         end
+        local type 
+        if Races[Player.PlayerData.citizenid].RaceType == "train" then
+            type = "race"
+        else
+            type = Races[Player.PlayerData.citizenid].RaceType
+        end
+    
+        for k, v in pairs(Races[Player.PlayerData.citizenid].RaceDrivers) do
+            local result = MySQL.Sync.fetchAll('SELECT * FROM races WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {Races[Player.PlayerData.citizenid].RaceTrack, k, type, v.car})
+            if result[1] then
+                v.best = result[1].best
+            else
+                v.best = 0
+            end
+        end
+    
+        for k, v in pairs(Races[Player.PlayerData.citizenid].RaceDrivers) do
+            TriggerClientEvent('qb-races:client:CountdownRace', v.source, Player.PlayerData.citizenid, Races[Player.PlayerData.citizenid].RaceDrivers, v.best)
+        end
+        Races[Player.PlayerData.citizenid].RaceRunning = true
+    else
+        TriggerClientEvent('QBCore:Notify', src, Lang:t("error_no_race"), 'error')
     end
-
-    for k, v in pairs(Races[Player.PlayerData.citizenid].RaceDrivers) do
-        TriggerClientEvent('qb-races:client:CountdownRace', v.source, Player.PlayerData.citizenid, Races[Player.PlayerData.citizenid].RaceDrivers, v.best)
-    end
-    Races[Player.PlayerData.citizenid].RaceRunning = true
 end
 
 QBCore.Functions.CreateCallback('qb-races:server:GetStats', function(source, cb, track, type, perso)

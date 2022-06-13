@@ -127,12 +127,9 @@ local function DrawHudText(text, colour, coordsx, coordsy, scalex, scaley)
 end
 
 CreateThread(function()			--Frame Thread
-	local wait = 1000
 
 	while true do
-		Wait(wait)
 		if driftMode then
-			wait = 0
 			SetVehicleCheatPowerIncrease(driftVehicle, 5.0)
 			if driftScore ~= 0 then
 				DrawHudText(tostring(driftScore), {255, 191, 0, 255}, 0.5, 0.05, 0.7, 0.7)
@@ -140,22 +137,20 @@ CreateThread(function()			--Frame Thread
 			--if driftTotalScore ~= 0 then
 			--	DrawHudText(tostring(driftTotalScore), {255, 191, 0, 255}, 0.05, 0.6, 0.7, 0.7)
 			--end
+			Wait(0)
 		else
-			wait = 1000
+			Wait(1000)
 		end
 	end
 end)
 
 
 CreateThread( function()		--Score Thread
-	local wait = 1000
 	local tick
 	local body
 
 	while true do
-		Wait(wait)
 		if driftMode then
-			wait = 100
 			local angle,velocity = angle(driftVehicle)
 			tick = GetGameTimer()
 
@@ -179,6 +174,9 @@ CreateThread( function()		--Score Thread
 				driftScore = 0
 				drifting = false
 			end
+			Wait(100)
+		else
+			Wait(1000)
 		end
 	end
 end)

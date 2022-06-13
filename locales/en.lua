@@ -53,6 +53,7 @@ local Translations = {
     error_not_authorized = "You have not been authorized to edit tracks.",
     error_race_cancelled = "Race is cancelled",
     error_added_to_race = "Error adding in race",
+    error_no_race = "You didn't created any race",
 
     success_race_saved = "Race: %{value} is saved!",
     success_won_race_fee = "You won the race and $%{value}",
