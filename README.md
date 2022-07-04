@@ -24,9 +24,9 @@ Race Track Creation and Race management For QB-Core
 
 
 # Installation
-Import races.sql in your DB
+* Import races.sql in your DB
 
-Add in qb-core/shared/items.lua
+* Add in qb-core/shared/items.lua
 ```lua
 	['drift'] 				 	 = {['name'] = 'drift', 			  	  		['label'] = 'Drift configuration', 					['weight'] = 1000, 		['type'] = 'item', 		['image'] = 'laptop.png', 				['unique'] = true, 	['useable'] = true, 	['shouldClose'] = true,	   ['combinable'] = nil,   ['description'] = 'Chip to toggle drift mode'},
 ```
