@@ -2,25 +2,25 @@
 Race Track Creation and Race management For QB-Core
 
 # Features
-Track creator/editor in game with command /raceadmin
-Track creator is accessible to the staff (admin, god) and to specified citizenid in the config
-Tracks made as lua files to allow save and sharing
-Each track have a maximum time to run, each driver must finish the race before this time
-Race creation with command /race
-Race can be created for a track or with a waypoint
-Race on tracks must be created near the track
-Number of laps can be specified for track races
-Race can be created with a fee, winner takes all
-Once created, the race can be joined by drivers
-Once joined, the starting line is shown to align cars
-The race creator launch the race with command /racestart
-No race can be created on a track if a race already running
-Races can be race or drift type, race save lap time, drift save points
-Best lap times and points are stored in DB for statistics and retrieved before a race
-Drift points are from angle and speed, each bump cancel the current drift points (like in need for speed)
-Your participation in a race can be cancelled with command /racequit, bests are not stored
-General statistics can be consulted by track (10 best times/scores with names and car)
-Personal statistics can be consulted by track (10 best times/scores with car)
+* Track creator/editor in game with command /raceadmin
+* Track creator is accessible to the staff (admin, god) and to specified citizenid in the config
+* Tracks made as lua files to allow save and sharing
+* Each track have a maximum time to run, each driver must finish the race before this time
+* Race creation with command /race
+* Race can be created for a track or with a waypoint
+* Race on tracks must be created near the track
+* Number of laps can be specified for track races
+* Race can be created with a fee, winner takes all
+* Once created, the race can be joined by drivers
+* Once joined, the starting line is shown to align cars
+* The race creator launch the race with command /racestart
+* No race can be created on a track if a race already running
+* Races can be race or drift type, race save lap time, drift save points
+* Best lap times and points are stored in DB for statistics and retrieved before a race
+* Drift points are from angle and speed, each bump cancel the current drift points (like in need for speed)
+* Your participation in a race can be cancelled with command /racequit, bests are not stored
+* General statistics can be consulted by track (10 best times/scores with names and car)
+* Personal statistics can be consulted by track (10 best times/scores with car)
 
 
 # Installation
