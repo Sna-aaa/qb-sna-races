@@ -51,7 +51,8 @@ local Translations = {
     error_no_configuration = "You lack the car configuration for this race",
     error_not_enough_cash = "You dont have enough cash",
     error_not_authorized = "You have not been authorized to edit tracks.",
-    error_race_cancelled = "Race is cancelled",
+    error_race_cancelled = "Your race participation was cancelled",
+    error_race_timeout = "You took too much time to finish your lap, race is cancelled",
     error_added_to_race = "Error adding in race",
     error_no_race = "You didn't created any race",
 

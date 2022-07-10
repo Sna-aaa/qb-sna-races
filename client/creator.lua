@@ -126,6 +126,7 @@ local function SaveRace()
 
     TriggerServerEvent('qb-races:server:SaveTrack', CreatorData, CreatorData.TrackId)
 
+    Config.Tracks[CreatorData.TrackId] = CreatorData
     QBCore.Functions.Notify(Lang:t("success_race_saved", {value = CreatorData.name}), 'success')
 
     for id,_ in pairs(CreatorData.checkpoints) do

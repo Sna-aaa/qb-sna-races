@@ -262,12 +262,17 @@ local function FinishRace()
 
 end
 
-local function CancelRace()
+local function CancelRace(reason)
     CurrentRaceData.BestLapValue = 0
     CurrentRaceData.TotalValue = 0
 
     TriggerServerEvent('qb-races:server:FinishRace', CurrentRaceData.RaceIndex, CurrentRaceData.BestLapValue, CurrentRaceData.TotalValue, "", true)
-    QBCore.Functions.Notify(Lang:t("error_race_cancelled"), 'error')
+    if reason == "TO" then
+        QBCore.Functions.Notify(Lang:t("error_race_timeout"), 'error')
+    elseif reason == "CA" then
+        QBCore.Functions.Notify(Lang:t("error_race_cancelled"), 'error')
+    end
+    
 
     if CurrentRaceData.RaceType == "drift" then
         TriggerEvent('qb-races:client:ToggleDrift')
@@ -301,7 +306,7 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
 end)
 
 RegisterNetEvent('qb-races:client:CancelRace', function()
-    CancelRace()
+    CancelRace("CA")
 end)
 
 RegisterNetEvent('qb-races:client:CreateRace', function(data, id)
@@ -472,7 +477,7 @@ CreateThread(function()
             end
             CurrentRaceData.SecurityTime = CurrentRaceData.SecurityTime + 1
             if CurrentRaceData.RaceTrack ~= "no" and CurrentRaceData.SecurityTime >= ( Config.Tracks[CurrentRaceData.RaceTrack].securitytime * CurrentRaceData.RaceLaps ) then
-                CancelRace()
+                CancelRace("TO")
             end
             Wait(100)
         else
