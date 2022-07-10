@@ -362,7 +362,13 @@ CreateThread(function()
     local wait
     while true do
         if CurrentRace and Marker then
-            DrawText3Ds(Races[CurrentRace].RaceJoin.x, Races[CurrentRace].RaceJoin.y, Races[CurrentRace].RaceJoin.z + 1, Lang:t("message_race_details", {value = Config.Tracks[Races[CurrentRace].RaceTrack].name, value1 = Races[CurrentRace].RaceType, value2 = Races[CurrentRace].RaceLaps, value3 = Races[CurrentRace].RaceFee}))
+            local racename
+            if Races[CurrentRace].RaceTrack == "no" then
+                racename = "Waypoint"
+            else
+                racename = Config.Tracks[Races[CurrentRace].RaceTrack].name
+            end
+            DrawText3Ds(Races[CurrentRace].RaceJoin.x, Races[CurrentRace].RaceJoin.y, Races[CurrentRace].RaceJoin.z + 1, Lang:t("message_race_details", {value = racename, value1 = Races[CurrentRace].RaceType, value2 = Races[CurrentRace].RaceLaps, value3 = Races[CurrentRace].RaceFee}))
             if IsControlJustReleased(0, 38) then    --Press E to join the race
                 local ped = PlayerPedId()
                 local vehicle = GetVehiclePedIsUsing(ped)

@@ -28,8 +28,8 @@ function UpdateUI(type, data) {
                 CreatorActive = true;
                 $(".editor").fadeIn(300);
             }
-            $("#editor-racename").html('Race: ' + data.data.TrackName);
-            $("#editor-checkpoints").html('Checkpoints: ' + data.data.Checkpoints.length + ' / ?');
+            $("#editor-racename").html('Race: ' + data.data.name);
+            $("#editor-checkpoints").html('Checkpoints: ' + data.data.checkpoints.length + ' / ?');
             $("#editor-keys-tiredistance").html('<span style="color: rgb(0, 201, 0);">+ ] </span> / <span style="color: rgb(255, 43, 43);">- [</span> - Tire Distance ['+data.data.TireDistance+'.0]');
             if (data.data.ClosestCheckpoint !== undefined && data.data.ClosestCheckpoint !== 0) {
                 $("#editor-keys-delete").html('<span style="color: rgb(255, 43, 43);">8</span> - Delete Checkpoint [' + data.data.ClosestCheckpoint + ']');
