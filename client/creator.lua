@@ -126,7 +126,6 @@ local function SaveRace()
 
     TriggerServerEvent('qb-races:server:SaveTrack', CreatorData, CreatorData.TrackId)
 
-    Config.Tracks[CreatorData.TrackId] = CreatorData
     QBCore.Functions.Notify(Lang:t("success_race_saved", {value = CreatorData.name}), 'success')
 
     for id,_ in pairs(CreatorData.checkpoints) do
@@ -298,6 +297,9 @@ local function CreatorUI()
         end
     end)
 end
+RegisterNetEvent('qb-races:client:SaveTrack', function(id, data)
+    Config.Tracks[id] = data
+end)
 
 RegisterNetEvent('qb-races:client:CreateTrack', function(id, name, security)
     if not InCreator then
