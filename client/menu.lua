@@ -123,24 +123,6 @@ local function MenuRace()
                 isRequired = false,
                 default = "",
             },
-			{
-				text = Lang:t("menu_race_instance"),
-				name = "instance",
-				type = "select",
-				options = {
-					{ value = false, text = Lang:t("menu_no") },
-					{ value = true, text = Lang:t("menu_yes") },
-				},
-				default = false
-			},
-
-            {
-                text = Lang:t("menu_race_instance"),
-                name = "Instance",
-                type = "bool",
-                isRequired = false,
-                default = "",
-            },
         }
     })
     if dialog then 
