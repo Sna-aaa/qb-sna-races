@@ -19,7 +19,7 @@ CurrentRaceData = {
     RaceType = nil,
     RaceLaps = nil,
     RaceTrack = nil,
-    RaceDrivers = {},
+    RaceDrivers = 0,
     RaceStarted = false,
     Checkpoints = {},
     CurrentCheckpoint = 0,
@@ -93,7 +93,7 @@ local function RaceUI()
                         TotalLaps = CurrentRaceData.RaceLaps,
                         CurrentLap = CurrentRaceData.CurrentLap,
                         Position = CurrentRaceData.CurrentPos,
-                        Drivers = #CurrentRaceData.RaceDrivers,
+                        Drivers = CurrentRaceData.RaceDrivers,
                         LapValue = CurrentRaceData.LapValue,
                         TotalValue = CurrentRaceData.TotalValue,
                         BestLapValue = CurrentRaceData.BestLapValue,
@@ -115,7 +115,7 @@ local function RaceUI()
     end)
 end
 
-local function SetupRace(id, drivers)
+local function SetupRace(id)
     if Races[id].RaceTrack ~= "no" then
         for k, v in pairs(Config.Tracks[Races[id].RaceTrack].checkpoints) do
             ClearAreaOfObjects(v.offset.left.x, v.offset.left.y, v.offset.left.z, 50.0, 0)
@@ -253,7 +253,7 @@ local function FinishRace()
     CurrentRaceData.RaceType = nil
     CurrentRaceData.RaceLaps = 0
     CurrentRaceData.RaceTrack = nil
-    CurrentRaceData.RaceDrivers = {}
+    CurrentRaceData.RaceDrivers = 0
 
     CurrentRaceData.Checkpoints = {}
     CurrentRaceData.RaceStarted = false
@@ -287,7 +287,7 @@ local function CancelRace(reason)
     CurrentRaceData.RaceType = nil
     CurrentRaceData.RaceLaps = 0
     CurrentRaceData.RaceTrack = nil
-    CurrentRaceData.RaceDrivers = {}
+    CurrentRaceData.RaceDrivers = 0
 
     CurrentRaceData.Checkpoints = {}
     CurrentRaceData.RaceStarted = false
@@ -319,8 +319,12 @@ RegisterNetEvent('qb-races:client:RemoveRace', function(id)
     Marker = false
 end)
 
+RegisterNetEvent('qb-races:client:GetPosition', function(position)
+    CurrentRaceData.CurrentPos = position
+end)
+
 RegisterNetEvent('qb-races:client:CountdownRace', function(id, drivers, best)
-    SetupRace(id, drivers)
+    SetupRace(id)
     if Races[id].RaceTrack ~= "no" then
         SetNewWaypoint(Config.Tracks[Races[id].RaceTrack].checkpoints[1].coords.x, Config.Tracks[Races[id].RaceTrack].checkpoints[1].coords.y)
     else
@@ -337,6 +341,7 @@ RegisterNetEvent('qb-races:client:CountdownRace', function(id, drivers, best)
     CurrentRaceData.CurrentLap = 1
     CurrentRaceData.BestLapValue = best
     CurrentRaceData.LapValue = 0
+    CurrentRaceData.CurrentPos = 0
     CurrentRaceData.TotalValue = 0
     CurrentRaceData.SecurityTime = 0
 
@@ -414,6 +419,7 @@ CreateThread(function()
                 local data = Config.Tracks[CurrentRaceData.RaceTrack].checkpoints[CurrentRaceData.NextCheckpoint]
                 local CheckpointDistance = #(pos - vector3(data.coords.x, data.coords.y, data.coords.z))
                 local MaxDistance = GetMaxDistance(Config.Tracks[CurrentRaceData.RaceTrack].checkpoints[CurrentRaceData.NextCheckpoint].offset)
+                TriggerServerEvent('qb-races:server:SendPosition', CurrentRace, CheckpointDistance, CurrentRaceData.NextCheckpoint, CurrentRaceData.CurrentLap)
                 if CheckpointDistance < MaxDistance then
                     CurrentRaceData.CurrentCheckpoint = CurrentRaceData.CurrentCheckpoint + 1
                     CurrentRaceData.NextCheckpoint = CurrentRaceData.NextCheckpoint + 1
@@ -457,6 +463,7 @@ CreateThread(function()
                 end
             else
                 local CheckpointDistance = #(vector2(pos.x, pos.y) - vector2(CurrentRaceData.RaceFinish.x, CurrentRaceData.RaceFinish.y))
+                TriggerServerEvent('qb-races:server:SendPosition', CurrentRace, CheckpointDistance, nil, nil)
                 if CheckpointDistance < 15 then
                     FinishRace()
                 end

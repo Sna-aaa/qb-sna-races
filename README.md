@@ -1,6 +1,8 @@
 # qb-races
 Race Track Creation and Race management For QB-Core
 
+Join our Discord : https://discord.gg/kvSwVzD8Rd
+
 # Features
 * Track creator/editor in game with command /raceadmin
 * Track creator is accessible to the staff (admin, god) and to specified citizenid in the config

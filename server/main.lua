@@ -1,5 +1,6 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local Races = {}
+local RacePositions = {}
 
 QBCore.Functions.CreateUseableItem("drift", function(source, item)
     TriggerClientEvent('smallresource:client:ToggleDrift', source)
@@ -163,9 +164,9 @@ RegisterNetEvent('qb-races:server:FinishRace', function(id, bestlap, total, car,
             MySQL.Async.insert('INSERT INTO races (track, citizenid, type, car, best) VALUES (?, ?, ?, ?, ?)', {Races[id].RaceTrack, id, type, car, bestlap})
         end
     end
-    Races[id].RaceDrivers[Player.PlayerData.citizenid].score = total
-    Races[id].RaceDrivers[Player.PlayerData.citizenid].best = bestlap
-    Races[id].RaceDrivers[Player.PlayerData.citizenid].finished = true
+    Races[id].RaceDrivers[source].score = total
+    Races[id].RaceDrivers[source].best = bestlap
+    Races[id].RaceDrivers[source].finished = true
     if not Races[id].FirstArrived and Races[id].RaceType == "race" and not cancel then
         Races[id].FirstArrived = true
         if Races[id].RacePot ~= 0 then
@@ -185,24 +186,61 @@ RegisterNetEvent('qb-races:server:FinishRace', function(id, bestlap, total, car,
         else
             if v.score > best then
                 best = v.score
-                index = k
+                index = v.source
             end
         end
     end    
     if not running then
         if Races[id].RaceType == "drift" then
             if Races[id].RacePot ~= 0 then
-                local DriverPlayer = QBCore.Functions.GetPlayer(Races[id].RaceDrivers[index].source)
+                local DriverPlayer = QBCore.Functions.GetPlayer(index)
                 DriverPlayer.Functions.AddMoney('cash', Races[id].RacePot, "race-won")
-                TriggerClientEvent('QBCore:Notify', Races[id].RaceDrivers[index].source, Lang:t("success_won_drift_fee", {value = Races[id].RacePot}), 'success')
+                TriggerClientEvent('QBCore:Notify', index, Lang:t("success_won_drift_fee", {value = Races[id].RacePot}), 'success')
             else
-                TriggerClientEvent('QBCore:Notify', Races[id].RaceDrivers[index].source, Lang:t("success_won_drift"), 'success')
+                TriggerClientEvent('QBCore:Notify', index, Lang:t("success_won_drift"), 'success')
             end
         end
-        if Races[Player.PlayerData.citizenid].RaceTrack ~= "no" then
+        if Races[id].RaceTrack ~= "no" then
             Config.Tracks[Races[id].RaceTrack].occupied = false
         end
         Races[id] = nil
+    end
+end)
+
+RegisterNetEvent('qb-races:server:SendPosition', function(index, distance, checkpoint, lap)
+    local src = source
+    if Races[index] then
+        Races[index].RaceDrivers[src].distance = distance
+        Races[index].RaceDrivers[src].checkpoint = checkpoint
+        Races[index].RaceDrivers[src].lap = lap
+        if lap then
+            Races[index].RaceDrivers[src].forpos = 100000000 - ( lap * 1000000 ) - (checkpoint * 10000) + distance
+        else
+            Races[index].RaceDrivers[src].forpos = distance
+        end
+    end
+end)
+
+CreateThread(function()
+    local sleep
+    while true do
+        sleep = 1000
+        for k, v in pairs(Races) do
+            if v.RaceRunning then
+                RacePositions[k] = {}
+                for i, w in pairs(v.RaceDrivers) do
+                    RacePositions[k][#RacePositions[k] + 1] = w
+                end
+                if RacePositions[k] then
+                    table.sort(RacePositions[k], function(k1, k2) return k1.forpos < k2.forpos end)
+                    for k, v in pairs(RacePositions[k]) do
+                        TriggerClientEvent('qb-races:client:GetPosition', v.source, k)
+                    end
+                end
+                sleep = 100
+            end
+        end
+        Wait(sleep)
     end
 end)
 
@@ -233,9 +271,11 @@ QBCore.Functions.CreateCallback('qb-races:server:JoinRace', function(source, cb,
             Player.Functions.RemoveMoney('cash', Races[index].RaceFee, "race-joined")
         end
         Races[index].RacePot = Races[index].RacePot + Races[index].RaceFee
-        Races[index].RaceDrivers[Player.PlayerData.citizenid] = {}
-        Races[index].RaceDrivers[Player.PlayerData.citizenid].source = source
-        Races[index].RaceDrivers[Player.PlayerData.citizenid].car = car
+        Races[index].RaceDrivers[source] = {}
+        Races[index].RaceDrivers[source].citizenid = Player.PlayerData.citizenid
+        Races[index].RaceDrivers[source].source = source
+        Races[index].RaceDrivers[source].car = car
+        Races[index].RaceDrivers[source].forpos = 0
     end
     cb(JoinOk)
 end)
@@ -253,18 +293,19 @@ local function StartRace(src)
         else
             type = Races[Player.PlayerData.citizenid].RaceType
         end
+        local drivers = 0
     
         for k, v in pairs(Races[Player.PlayerData.citizenid].RaceDrivers) do
-            local result = MySQL.Sync.fetchAll('SELECT * FROM races WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {Races[Player.PlayerData.citizenid].RaceTrack, k, type, v.car})
+            drivers = drivers + 1
+            local result = MySQL.Sync.fetchAll('SELECT * FROM races WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {Races[Player.PlayerData.citizenid].RaceTrack, v.citizenid, type, v.car})
             if result[1] then
                 v.best = result[1].best
             else
                 v.best = 0
             end
         end
-    
         for k, v in pairs(Races[Player.PlayerData.citizenid].RaceDrivers) do
-            TriggerClientEvent('qb-races:client:CountdownRace', v.source, Player.PlayerData.citizenid, Races[Player.PlayerData.citizenid].RaceDrivers, v.best)
+            TriggerClientEvent('qb-races:client:CountdownRace', v.source, Player.PlayerData.citizenid, drivers, v.best)
         end
         Races[Player.PlayerData.citizenid].RaceRunning = true
     else
