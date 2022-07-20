@@ -166,9 +166,11 @@ RegisterNetEvent('qb-races:server:FinishRace', function(id, bestlap, total, car,
             MySQL.Async.insert('INSERT INTO races (track, citizenid, type, car, best) VALUES (?, ?, ?, ?, ?)', {Races[id].RaceTrack, id, type, car, bestlap})
         end
     end
-    Races[id].RaceDrivers[source].score = total
-    Races[id].RaceDrivers[source].best = bestlap
-    Races[id].RaceDrivers[source].finished = true
+    print(src)
+    print(QBCore.Debug(Races[id]))
+    Races[id].RaceDrivers[src].score = total
+    Races[id].RaceDrivers[src].best = bestlap
+    Races[id].RaceDrivers[src].finished = true
     if not Races[id].FirstArrived and Races[id].RaceType == "race" and not cancel then
         Races[id].FirstArrived = true
         if Races[id].RacePot ~= 0 then
@@ -382,7 +384,7 @@ local Namedinstances = {}
  
 RegisterNetEvent("instance:setNamed", function(setName)
  
-    print('[INSTANCES] Named Instances looked like this: ', json.encode(Namedinstances))
+    --print('[INSTANCES] Named Instances looked like this: ', json.encode(Namedinstances))
     local src = source
     local instanceSource = nil
  
@@ -435,5 +437,9 @@ RegisterNetEvent("instance:setNamed", function(setName)
         src --[[ string ]], 
         instanceSource
     )
-    print('[INSTANCES] Named Instances now look like this: ', json.encode(Namedinstances))
+    --print('[INSTANCES] Named Instances now look like this: ', json.encode(Namedinstances))
+end)
+
+QBCore.Functions.CreateCallback('qb-races:server:GetListedRaces', function(_, cb)
+    cb(Races)
 end)
