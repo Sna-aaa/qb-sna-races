@@ -147,22 +147,22 @@ RegisterNetEvent('qb-races:server:FinishRace', function(id, bestlap, total, car,
         else
             type = Races[id].RaceType
         end
-        local result = MySQL.Sync.fetchAll('SELECT * FROM races WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {Races[id].RaceTrack, Player.PlayerData.citizenid, type, car})
+        local result = MySQL.query.await('SELECT * FROM races WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {Races[id].RaceTrack, Player.PlayerData.citizenid, type, car})
         if result[1] then
             if Races[id].RaceType == "drift" then
                 if bestlap > result[1].best then
                     TriggerClientEvent('QBCore:Notify', src, "Your best score is updated", 'success')
-                    MySQL.Async.execute('UPDATE races SET best = ? WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {bestlap, Races[id].RaceTrack, Player.PlayerData.citizenid, type, car})
+                    MySQL.update('UPDATE races SET best = ? WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {bestlap, Races[id].RaceTrack, Player.PlayerData.citizenid, type, car})
                 end
             else
                 if bestlap < result[1].best then
                     TriggerClientEvent('QBCore:Notify', src, "Your best lap is updated", 'success')
-                    MySQL.Async.execute('UPDATE races SET best = ? WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {bestlap, Races[id].RaceTrack, Player.PlayerData.citizenid, type, car})
+                    MySQL.update('UPDATE races SET best = ? WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {bestlap, Races[id].RaceTrack, Player.PlayerData.citizenid, type, car})
                 end
             end
         else
             TriggerClientEvent('QBCore:Notify', src, "New best score for this car", 'success')
-            MySQL.Async.insert('INSERT INTO races (track, citizenid, type, car, best) VALUES (?, ?, ?, ?, ?)', {Races[id].RaceTrack, Player.PlayerData.citizenid, type, car, bestlap})
+            MySQL.insert('INSERT INTO races (track, citizenid, type, car, best) VALUES (?, ?, ?, ?, ?)', {Races[id].RaceTrack, Player.PlayerData.citizenid, type, car, bestlap})
         end
     end
     Races[id].RaceDrivers[src].score = total
@@ -298,7 +298,7 @@ local function StartRace(src)
     
         for k, v in pairs(Races[Player.PlayerData.citizenid].RaceDrivers) do
             drivers = drivers + 1
-            local result = MySQL.Sync.fetchAll('SELECT * FROM races WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {Races[Player.PlayerData.citizenid].RaceTrack, v.citizenid, type, v.car})
+            local result = MySQL.query.await('SELECT * FROM races WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {Races[Player.PlayerData.citizenid].RaceTrack, v.citizenid, type, v.car})
             if result[1] then
                 v.best = result[1].best
             else
@@ -325,7 +325,7 @@ QBCore.Functions.CreateCallback('qb-races:server:GetStats', function(source, cb,
     end
     if perso then
 
-        local res = MySQL.Sync.fetchAll('SELECT * FROM races WHERE track = ? AND citizenid = ? AND type = ? ORDER BY best '..direction..' LIMIT '..Config.StatsLimit, {track, Player.PlayerData.citizenid, type})
+        local res = MySQL.query.await('SELECT * FROM races WHERE track = ? AND citizenid = ? AND type = ? ORDER BY best '..direction..' LIMIT '..Config.StatsLimit, {track, Player.PlayerData.citizenid, type})
         for k, v in pairs(res) do
             result[#result + 1] = {
                 best = v.best,
@@ -334,7 +334,7 @@ QBCore.Functions.CreateCallback('qb-races:server:GetStats', function(source, cb,
             }
         end
     else
-        local res = MySQL.Sync.fetchAll('SELECT races.best, races.car, players.charinfo FROM races INNER JOIN players ON races.citizenid = players.citizenid WHERE races.track = ? AND races.type = ? ORDER BY best '..direction..' LIMIT '..Config.StatsLimit, {track, type})
+        local res = MySQL.query.await('SELECT races.best, races.car, players.charinfo FROM races INNER JOIN players ON races.citizenid = players.citizenid WHERE races.track = ? AND races.type = ? ORDER BY best '..direction..' LIMIT '..Config.StatsLimit, {track, type})
         for k, v in pairs(res) do
             local charinfo = json.decode(v.charinfo)
             result[#result + 1] = {
