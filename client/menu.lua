@@ -123,16 +123,6 @@ local function MenuRace()
                 isRequired = false,
                 default = "",
             },
-			--{
-			--	text = Lang:t("menu_race_instance"),
-			--	name = "instance",
-			--	type = "select",
-			--	options = {
-			--		{ value = false, text = Lang:t("menu_no") },
-			--		{ value = true, text = Lang:t("menu_yes") },
-			--	},
-			--	default = false
-			--},
         }
     })
     if dialog then 
@@ -144,7 +134,7 @@ local function MenuRace()
             local WaypointHandle = GetFirstBlipInfoId(8)
             if DoesBlipExist(WaypointHandle) then
                 finish = GetBlipInfoIdCoord(WaypointHandle, Citizen.ReturnResultAnyway(), Citizen.ResultAsVector())
-                TriggerServerEvent('qb-races:server:CreateRace', dialog.racetype, math.floor(dialog.laps), dialog.track, math.floor(dialog.fee), finish, dialog.instance)
+                TriggerServerEvent('qb-races:server:CreateRace', dialog.racetype, math.floor(dialog.laps), dialog.track, math.floor(dialog.fee), finish)
             else
                 QBCore.Functions.Notify(Lang:t("error_waypoint_needed"), "error")
             end
@@ -154,7 +144,7 @@ local function MenuRace()
             local pos = GetEntityCoords(ped)
             local pointDistance = #(pos - vector3(Config.Tracks[dialog.track].checkpoints[1].coords.x, Config.Tracks[dialog.track].checkpoints[1].coords.y, Config.Tracks[dialog.track].checkpoints[1].coords.z))
             if pointDistance < 300 then
-                TriggerServerEvent('qb-races:server:CreateRace', dialog.racetype, math.floor(dialog.laps), dialog.track, math.floor(dialog.fee), nil, dialog.instance)
+                TriggerServerEvent('qb-races:server:CreateRace', dialog.racetype, math.floor(dialog.laps), dialog.track, math.floor(dialog.fee), nil)
             else
                 QBCore.Functions.Notify(Lang:t("error_too_far"), "error")
             end

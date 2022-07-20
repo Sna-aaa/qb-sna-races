@@ -259,7 +259,6 @@ local function FinishRace()
     CurrentRaceData.RaceStarted = false
     CurrentRaceData.CurrentCheckpoint = 0
     CurrentRaceData.CurrentLap = 0
-    TriggerServerEvent('instance:setNamed', 0)
 end
 
 local function CancelRace(reason)
@@ -345,9 +344,6 @@ RegisterNetEvent('qb-races:client:CountdownRace', function(id, drivers, best)
     CurrentRaceData.CurrentPos = 0
     CurrentRaceData.TotalValue = 0
     CurrentRaceData.SecurityTime = 0
-    if Races[id].Instance then
-        TriggerServerEvent('instance:setNamed', "race"..id)  -- InstanceName can be any string, e.g Apartment-26        
-    end
 
 
     if CurrentRaceData.RaceType == "drift" then

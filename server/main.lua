@@ -109,7 +109,7 @@ RegisterNetEvent('qb-races:server:SaveTrack', function(TrackData, id)
     TriggerClientEvent('qb-races:client:SaveTrack', -1, id, trackData)
 end)
 
-RegisterNetEvent('qb-races:server:CreateRace', function(type, laps, track, fee, finish, instance)
+RegisterNetEvent('qb-races:server:CreateRace', function(type, laps, track, fee, finish)
     local src = source
 	local Player = QBCore.Functions.GetPlayer(src)
     local PlayerPed = GetPlayerPed(src)
@@ -131,7 +131,6 @@ RegisterNetEvent('qb-races:server:CreateRace', function(type, laps, track, fee, 
             RaceFee = fee,
             RacePot = 0,
             FirstArrived = false,
-            Instance = instance,
             RaceDrivers = {},
         }
         TriggerClientEvent('qb-races:client:CreateRace', -1, Races[Player.PlayerData.citizenid], Player.PlayerData.citizenid)
@@ -148,26 +147,24 @@ RegisterNetEvent('qb-races:server:FinishRace', function(id, bestlap, total, car,
         else
             type = Races[id].RaceType
         end
-        local result = MySQL.Sync.fetchAll('SELECT * FROM races WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {Races[id].RaceTrack, id, type, car})
+        local result = MySQL.Sync.fetchAll('SELECT * FROM races WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {Races[id].RaceTrack, Player.PlayerData.citizenid, type, car})
         if result[1] then
             if Races[id].RaceType == "drift" then
                 if bestlap > result[1].best then
                     TriggerClientEvent('QBCore:Notify', src, "Your best score is updated", 'success')
-                    MySQL.Async.execute('UPDATE races SET best = ? WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {bestlap, Races[id].RaceTrack, id, type, car})
+                    MySQL.Async.execute('UPDATE races SET best = ? WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {bestlap, Races[id].RaceTrack, Player.PlayerData.citizenid, type, car})
                 end
             else
                 if bestlap < result[1].best then
                     TriggerClientEvent('QBCore:Notify', src, "Your best lap is updated", 'success')
-                    MySQL.Async.execute('UPDATE races SET best = ? WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {bestlap, Races[id].RaceTrack, id, type, car})
+                    MySQL.Async.execute('UPDATE races SET best = ? WHERE track = ? AND citizenid = ? AND type = ? AND car = ?', {bestlap, Races[id].RaceTrack, Player.PlayerData.citizenid, type, car})
                 end
             end
         else
             TriggerClientEvent('QBCore:Notify', src, "New best score for this car", 'success')
-            MySQL.Async.insert('INSERT INTO races (track, citizenid, type, car, best) VALUES (?, ?, ?, ?, ?)', {Races[id].RaceTrack, id, type, car, bestlap})
+            MySQL.Async.insert('INSERT INTO races (track, citizenid, type, car, best) VALUES (?, ?, ?, ?, ?)', {Races[id].RaceTrack, Player.PlayerData.citizenid, type, car, bestlap})
         end
     end
-    print(src)
-    print(QBCore.Debug(Races[id]))
     Races[id].RaceDrivers[src].score = total
     Races[id].RaceDrivers[src].best = bestlap
     Races[id].RaceDrivers[src].finished = true
@@ -376,68 +373,6 @@ end)
 
 QBCore.Commands.Add("racequit", Lang:t("command_racequit"), {}, false, function(source, args)
     TriggerClientEvent('qb-races:client:CancelRace', source)
-end)
-
- 
-local Namedinstances = {}
- 
- 
-RegisterNetEvent("instance:setNamed", function(setName)
- 
-    --print('[INSTANCES] Named Instances looked like this: ', json.encode(Namedinstances))
-    local src = source
-    local instanceSource = nil
- 
-    TriggerClientEvent('DoTheBigRefreshYmaps', src)
- 
-    if setName == 0 then
-            for k,v in pairs(Namedinstances) do
-                for k2,v2 in pairs(v.people) do
-                    if v2 == src then
-                        table.remove(v.people, k2)
-                    end
-                end
-                if #v.people == 0 then
-                    Namedinstances[k] = nil
-                end
-            end
-        instanceSource = setName
- 
-    else
-        for k,v in pairs(Namedinstances) do
-            if v.name == setName then
-                instanceSource = k
-            end
-        end
- 
-        if instanceSource == nil then
-            instanceSource = math.random(1, 63)
- 
-            while Namedinstances[instanceSource] and #Namedinstances[instanceSource] >= 1 do
-                instanceSource = math.random(1, 63)
-                Citizen.Wait(1)
-            end
-        end
-    end
- 
-    if instanceSource ~= 0 then
- 
-        if not Namedinstances[instanceSource] then
-            Namedinstances[instanceSource] = {
-                name = setName,
-                people = {}
-            }
-        end
- 
-        table.insert(Namedinstances[instanceSource].people, src)
- 
-    end
- 
-    SetPlayerRoutingBucket(
-        src --[[ string ]], 
-        instanceSource
-    )
-    --print('[INSTANCES] Named Instances now look like this: ', json.encode(Namedinstances))
 end)
 
 QBCore.Functions.CreateCallback('qb-races:server:GetListedRaces', function(_, cb)
