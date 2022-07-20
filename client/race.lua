@@ -420,7 +420,7 @@ CreateThread(function()
                 local data = Config.Tracks[CurrentRaceData.RaceTrack].checkpoints[CurrentRaceData.NextCheckpoint]
                 local CheckpointDistance = #(pos - vector3(data.coords.x, data.coords.y, data.coords.z))
                 local MaxDistance = GetMaxDistance(Config.Tracks[CurrentRaceData.RaceTrack].checkpoints[CurrentRaceData.NextCheckpoint].offset)
-                TriggerServerEvent('qb-races:server:SendPosition', CurrentRace, CheckpointDistance, CurrentRaceData.NextCheckpoint, CurrentRaceData.CurrentLap)
+                TriggerServerEvent('qb-races:server:SendPosition', CurrentRace, CheckpointDistance, CurrentRaceData.CurrentCheckpoint, CurrentRaceData.CurrentLap)
                 if CheckpointDistance < MaxDistance then
                     CurrentRaceData.CurrentCheckpoint = CurrentRaceData.CurrentCheckpoint + 1
                     CurrentRaceData.NextCheckpoint = CurrentRaceData.NextCheckpoint + 1
