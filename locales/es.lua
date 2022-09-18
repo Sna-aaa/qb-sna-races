@@ -78,15 +78,11 @@ local Translations = {
     command_racequit = "Salir de tu carrera configurada",
 }
 
-if not Lang then            --This test is only needed in locale en, please comment it on other languages
-
-    local templocale = Locale:new({
-        phrases = Translations,
-        warnOnMissing = true,
-        locale = "es"
-    }) 
-    if templocale then
-        Lang = templocale
-    end
-  
-end                         --Comment this line also
+local templocale = Locale:new({
+    phrases = Translations,
+    warnOnMissing = true,
+    locale = "es"
+}) 
+if templocale then
+    Lang = templocale
+end
