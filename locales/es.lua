@@ -82,7 +82,8 @@ local templocale = Locale:new({
     phrases = Translations,
     warnOnMissing = true,
     locale = "es"
-}) 
+})
+
 if templocale then
     Lang = templocale
 end
